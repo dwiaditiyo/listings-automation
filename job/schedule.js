@@ -1,5 +1,5 @@
 import cron from 'node-cron'
-import { poshmarkTrack, fashionphileTrack } from '../controllers/trackingController'
+import { poshmarkTrack, fashionphileTrack } from '../controllers/trackingController.js'
 
 export const runJob = ()=> {
 

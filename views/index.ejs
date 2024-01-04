@@ -155,7 +155,7 @@
   
               <div class="button-group">
                 <button type="submit" style="cursor: pointer;">Save</button>
-                <button style="cursor: pointer;" type="reset">Reset</button>
+                <button id="reset" style="cursor: pointer;" type="reset">Reset</button>
               </div>
             </div>
         </form>
@@ -190,13 +190,27 @@
   
        const fetchlist = document.querySelector('#fetch_listings')
        const uplist = document.querySelector('#upload_listings')
+       const email = document.querySelector('[name="email"]')
+       const password = document.querySelector('[name="password"]')
 
-       fetchlist.onclick = () => { 
+       const reset = document.querySelector('#reset')
+
+       fetchlist.onclick = () => {
           location.href = window.location.origin + '/fetch-listings'
        }
 
        uplist.onclick = () => {
-          location.href = window.location.origin + '/upload-listings'
+          if(email.value == '' && password.value ==''){
+              alert('Both email and password are required!')
+          } else{
+            location.href = window.location.origin + '/upload-listings'
+          }
        }
+
+       reset.onclick = () => {
+          email.removeAttribute("value")
+          password.removeAttribute("value")
+       }
+
     </script>
 </html>

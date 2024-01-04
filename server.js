@@ -93,7 +93,9 @@ app.post('/update-fashionphile-login', async (req, res) => {
     const { email, password } = req.body;
 
     db.set("fs_login.email", email);
-    db.set("fs_login.password", password);
+    if(password !== 'its not a password'){
+        db.set("fs_login.password", password);
+    }
 
     res.redirect('/');
 })
