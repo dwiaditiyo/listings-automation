@@ -15,7 +15,9 @@ export const download = (url, destination) => new Promise((resolve, reject) => {
 
     }).on('error', error => {
         
-        fs.unlink(destination)
+        fs.unlink(destination, (err) => {
+            console.log(err)
+        })
         console.log(error.message)
     })
 })

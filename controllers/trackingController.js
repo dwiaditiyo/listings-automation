@@ -1,5 +1,7 @@
 import dotenv from 'dotenv'
-import puppeteer from "puppeteer"
+import puppeteer from "puppeteer-extra"
+import StealthPlugin from 'puppeteer-extra-plugin-stealth'
+
 import { delay } from "./helperController.js"
 import { loginFashionphile } from "./loginScrapeController.js"
 import { getSheetTracking, updateTrackingPhoshmark, updateTrackingFashionphile } from "../config/spreadsheet.js"
@@ -7,7 +9,10 @@ import { getSheetTracking, updateTrackingPhoshmark, updateTrackingFashionphile }
 dotenv.config()
 
 const headless = process.env.HIDE_BROWSER
+const browserPath = process.env.BROWSER_PATH
 let browser = {}
+
+puppeteer.use(StealthPlugin())
 
 export const poshmarkTrack = async () => {
 
@@ -17,7 +22,7 @@ export const poshmarkTrack = async () => {
         // launch browser
         browser = await puppeteer.launch({
                 headless: (headless === 'true'),
-                executablePath: '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
+                executablePath: browserPath,
                 args: [
                 '--disable-infobars',
                 '--no-sandbox',
@@ -64,7 +69,7 @@ export const fashionphileTrack = async() => {
         // launch browser
         browser = await puppeteer.launch({
                 headless: (headless === 'true'),
-                executablePath: '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
+                executablePath: browserPath,
                 args: [
                 '--disable-infobars',
                 '--no-sandbox',

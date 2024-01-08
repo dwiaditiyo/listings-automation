@@ -1,7 +1,9 @@
 import path from "path";
 import dotenv from 'dotenv'
 import express  from "express";
-import puppeteer from "puppeteer";
+import puppeteer from "puppeteer-extra";
+import StealthPlugin from 'puppeteer-extra-plugin-stealth';
+
 import { fileURLToPath } from 'url';
 import { FSDB } from "file-system-db";
 import { runJob } from "./job/schedule.js";
@@ -18,6 +20,7 @@ const port = 3000
 
 var browser = {}
 const headless = process.env.HIDE_BROWSER
+const browserPath = process.env.BROWSER_PATH
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
@@ -28,13 +31,20 @@ app.use(express.json())
 app.use(express.urlencoded({ extended: false }))
 app.use(express.static(path.join(__dirname, 'views')))
 
+puppeteer.use(StealthPlugin())
+
 // tracking part
 runJob()
 
 app.get('/', async (req, res) => {
     const login_data = db.get("fs_login")
-    login_data.password = 'its not a password'
-    res.render('index.ejs', { data : login_data })
+  
+    if (typeof login_data !== 'undefined'){
+        login_data.password = 'its not a password'
+        res.render('index.ejs', { data : login_data })
+    }else{
+        res.render('index.ejs', { data : '' })
+    }
 })
 
 app.get('/fetch-listings', async (req, res) => {
@@ -47,7 +57,7 @@ app.get('/fetch-listings', async (req, res) => {
             // launch browser
             browser = await puppeteer.launch({
                     headless: (headless === 'true'),
-                    executablePath: '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
+                    executablePath: browserPath,
                     args: [
                     '--disable-infobars',
                     '--no-sandbox',
@@ -73,10 +83,16 @@ app.get('/fetch-listings', async (req, res) => {
             for (let index = 0; index < url.length; index++) {
             
                 const poshMarkUrl = url[index].listings_url;
-                console.log(poshMarkUrl);
-                const listing = await grabListing(browser, poshMarkUrl)
-                
-                await updateSheetFetch(index, listing)
+                const poshMarkTitle = url[index].title;
+
+                if (typeof poshMarkTitle === 'undefined'){
+        
+                    const listing = await grabListing(browser, poshMarkUrl)
+               
+                    if (typeof listing !== 'undefined'){
+                        await updateSheetFetch(index, listing)
+                    }
+                }
             }
 
             await browser.close()
@@ -86,6 +102,8 @@ app.get('/fetch-listings', async (req, res) => {
     } catch (error) {
 
         console.log(error.message)
+        await browser.close()
+        browser = {}
     }
 })
 
@@ -111,7 +129,7 @@ app.get('/upload-listings', async (req, res) => {
             // launch browser
             browser = await puppeteer.launch({
                     headless: (headless === 'true'),
-                    executablePath: '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
+                    executablePath: browserPath,
                     args: [
                     '--disable-infobars',
                     '--no-sandbox',
@@ -134,12 +152,16 @@ app.get('/upload-listings', async (req, res) => {
         }else{
 
             for (let index = 0; index < fetchData.length; index++) {
-            
-                await uploadListing(browser, fetchData[index])
-    
-                await insertSheetListing(fetchData[index])
-    
-                await deleteSheetFetch(fetchData[index].id)
+
+                const poshMarkTitle = fetchData[index].title;
+
+                if (typeof poshMarkTitle !== 'undefined'){
+                    await uploadListing(browser, fetchData[index])
+        
+                    await insertSheetListing(fetchData[index])
+        
+                    await deleteSheetFetch(fetchData[index].id)
+                }
             }
 
             await browser.close()
@@ -149,6 +171,8 @@ app.get('/upload-listings', async (req, res) => {
     } catch (error) {
 
         console.log(error.message)
+        await browser.close()
+        browser = {}
     }
 
    

@@ -23,6 +23,8 @@
     "moment-timezone": "^0.5.43",
     "node-cron": "^3.0.3",
     "puppeteer": "^21.6.1",
+    "puppeteer-extra": "^3.3.6",
+    "puppeteer-extra-plugin-stealth": "^2.11.2",
     "write-excel-file": "^1.4.27"
   }
 }

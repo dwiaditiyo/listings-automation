@@ -7,7 +7,8 @@ dotenv.config()
 
 const client_email = process.env.SEVICE_ACC_EMAIL
 const private_key = process.env.SEVICE_ACC_PRIVATE_KEY
-const sheetId = '1L6fde4INp8vry8IJ-ghbxypWnS9UTgSPnwXWfr60zzA'
+const sheetId = process.env.SHEET_ID
+// const sheetId = '1L6fde4INp8vry8IJ-ghbxypWnS9UTgSPnwXWfr60zzA'
 
 const serviceAccountAuth = new JWT({
     email: client_email,
