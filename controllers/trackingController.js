@@ -103,18 +103,44 @@ export const fashionphileTrack = async() => {
     
         await delay(2000)
         await page.goto('https://www.fashionphile.com/account/sales/quotes', { waitUntil: 'networkidle2', timeout: 0 })
-    
+        
+        const pagination = await page.evaluate(() => {
+            if(document.querySelectorAll('.page-link').length>0){
+                const pagi = Array.from(document.querySelectorAll('.page-link'))
+                const pagination = pagi.map(pg => pg.outerText)
+            }else{
+                return null
+            }
+        })
+
         const trackId = await page.evaluate(() => {
             const idTag = Array.from(document.querySelectorAll('.images>.text-muted'))
             const id = idTag.map(cat => cat.outerText)
             return id
         })
-    
+
+        if(pagination !== null){
+            
+            for (let index = 2; index < pagination.length -1; index++) {
+                const element = pagination[index];
+                await delay(2000)
+                await page.goto(`https://www.fashionphile.com/account/sales/quotes?page=${element}`, { waitUntil: 'networkidle2', timeout: 0 })
+
+                const trackIdPgn = await page.evaluate(() => {
+                    const idTag = Array.from(document.querySelectorAll('.images>.text-muted'))
+                    const id = idTag.map(cat => cat.outerText)
+                    return id
+                })
+
+                trackId = trackId.concat(trackIdPgn)
+            }
+        }
     
         for (let index = 0; index < trackId.length; index++) {
             let id = trackId[index].split(" ")
             let trackUrl = `https://www.fashionphile.com/quote-tracker?quoteId=${id[2]}`
-    
+            
+            await delay(1000)
             await page.goto(trackUrl, { waitUntil: 'networkidle2', timeout: 0 })
             
             const trackingData = await page.evaluate(() => {
