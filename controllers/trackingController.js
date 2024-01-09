@@ -155,8 +155,8 @@ export const fashionphileTrack = async() => {
                 return { title: title, status: status, offer: offer }
             })
             
-            await fashionphile.delete("poshmark");
-            await fashionphile.set("poshmark", [])
+            await fashionphile.delete("fashionphile");
+            await fashionphile.set("fashionphile", [])
 
             await insertFashionphile({
                 title: trackingData.title,
