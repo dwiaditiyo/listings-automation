@@ -154,3 +154,19 @@ export const deleteSheetFetch = async (id) => {
         }
     })
 }
+
+export const grabForManualTracking = async () => {
+    await doc.loadInfo()
+
+    const fetchData = doc.sheetsByIndex[1]
+
+    const rows = await fetchData.getRows()
+
+    let trackingData = []
+    rows.map((row, i)=> {
+        trackingData.push({ title: row.get('Title'), url: row.get('Poshmark Url'), status: row.get('Poshmark Status'), price: row.get('Price') })
+    })
+
+    console.log(trackingData);
+    return trackingData
+}

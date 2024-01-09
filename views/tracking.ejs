@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Listings System Manager</title>
+    <link rel="icon" type="image/x-icon" href="layout.png">
+    <link href="https://cdn.datatables.net/v/dt/jq-3.7.0/dt-1.13.8/b-2.4.2/datatables.min.css" rel="stylesheet">
+    <style>
+        a {
+          color: var(--color-shadow);
+          font-family: helvetica;
+        }
+
+        a:active {
+          color: black;
+        }
+        h1, h2, h3 {
+        font-weight: 900;
+        }
+    </style>
+</head>
+<body>
+    <div style="padding: 30px 30px;">
+        <!-- <h1>Listings Tracking</h1> -->
+        <table id="example" class="display" style="width:100%">
+            <thead>
+                <tr>
+                    <th>Title</th>
+                    <th>Price</th>
+                    <th>Fashionphile Satus</th>
+                    <th>Buyout Offer</th>
+                    <th style="width: 15%;">Updated At</th>
+                </tr>
+            </thead>
+            <tbody>
+                <% if(fashionphile){ 
+                    const dtfp = fashionphile
+
+                    for(var i = 0; i< dtfp.length; i++) {  
+                    const date = moment(dtfp[i][4]).tz("Asia/Jakarta").format("YYYY-MM-DD H:mm:ss")
+
+                    var dateps = ''
+                    if(dtfp[i][9]){
+                        dateps = moment(dtfp[i][9]).tz("Asia/Jakarta").format("YYYY-MM-DD H:mm:ss")
+                    }
+                %>
+                    <tr class="details-control" style="cursor: pointer;" data-url="<%= dtfp[i][6] %>" data-status="<%= dtfp[i][7] %>" data-updated-at="<%= dateps %>">
+                        <td><%= dtfp[i][0] %></td>
+                        <td><%= dtfp[i][8] %></td>
+                        <td><%= dtfp[i][2] %></td>
+                        <td><%= dtfp[i][3] %></td>
+                        <td><%= date %></td>
+                    </tr>
+                <%
+                    }
+                } %>
+            </tbody>
+        </table>
+    </div>
+</body>
+<script src="https://cdn.datatables.net/v/dt/jq-3.7.0/dt-1.13.8/b-2.4.2/datatables.min.js"></script>
+<script>
+    var table = new DataTable('#example', {
+        pagingType: 'full_numbers',
+        // order: [[ 1, 'asc' ]],
+    });
+    function format(url, status, updated_at) {
+      return `<div>
+                <p>Poshmark Data</p>
+                <p>Url : <a href="${url}">${url}</a></p>
+                <p>Status : ${status}</p>
+                <p>Updated At : ${updated_at}</p>
+              </div>  
+            `;
+    }
+    $(document).ready(function () {
+
+        // Add event listener for opening and closing details
+        $('#example').on('click', 'tr.details-control', function () {
+            var tr = $(this).closest('tr');
+            var row = table.row(tr);
+            console.log(row);
+
+            if (row.child.isShown()) {
+                // This row is already open - close it
+                row.child.hide();
+                tr.removeClass('shown');
+            } else {
+                // Open this row
+                row.child(format(tr.data('url'), tr.data('status'), tr.data('updated-at'))).show();
+                tr.addClass('shown');
+            }
+        });
+    });
+</script>
+</html>

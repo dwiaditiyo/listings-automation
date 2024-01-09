@@ -49,7 +49,7 @@
 
         .l-design-widht {
         max-width: 40rem;
-        padding: 1rem;
+        padding: 0.5rem;
         }
 
         .input {
@@ -115,15 +115,25 @@
         }
 
         .icon {
-        display: inline-block;
-        width: 1em;
-        height: 1em;
-        margin-right: 0.5em;
+          display: inline-block;
+          width: 1em;
+          height: 1em;
+          margin-right: 0.5em;
         }
 
         .hidden {
-        display: none;
+          display: none;
         }
+
+        a {
+          color: var(--color-shadow);
+          font-family: helvetica;
+        }
+
+        a:active {
+          color: black;
+        }
+
 </style>
 
 </head>
@@ -135,7 +145,7 @@
         <p><mark>⚠️</mark> WARNING: Please ensure accurate input <mark>⚠️</mark></p>
         
         <p>Your input is crucial for the proper functioning of this system. Incorrect data may lead to errors and unexpected outcomes. Take a moment to double-check your entries before proceeding.</p>
-        
+        <a href="/tracking">Tracking Page</a>
         <form style="text-align: left;" action="/update-fashionphile-login" method="POST">
           <div class="card">
               <h2><svg class="icon" aria-hidden="true">

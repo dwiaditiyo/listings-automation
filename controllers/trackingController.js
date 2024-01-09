@@ -2,14 +2,20 @@ import dotenv from 'dotenv'
 import puppeteer from "puppeteer-extra"
 import StealthPlugin from 'puppeteer-extra-plugin-stealth'
 
+import { oke } from './trackingFromshtController.js';
+import { FSDB } from "file-system-db";
 import { delay } from "./helperController.js"
+import { insertFashionphile } from '../config/database.js'
 import { loginFashionphile } from "./loginScrapeController.js"
 import { getSheetTracking, updateTrackingPhoshmark, updateTrackingFashionphile } from "../config/spreadsheet.js"
+
 
 dotenv.config()
 
 const headless = process.env.HIDE_BROWSER
 const browserPath = process.env.BROWSER_PATH
+const fashionphile = new FSDB("./dbfashionphile.json", false)
+
 let browser = {}
 
 puppeteer.use(StealthPlugin())
@@ -57,6 +63,8 @@ export const poshmarkTrack = async () => {
     
             await delay(10000)
         }
+        // grab poshmark from sheets
+        await oke()
     }
 
 }
@@ -120,7 +128,18 @@ export const fashionphileTrack = async() => {
     
                 return { title: title, status: status, offer: offer }
             })
-    
+            
+            await fashionphile.delete("poshmark");
+            await fashionphile.set("poshmark", [])
+
+            await insertFashionphile({
+                title: trackingData.title,
+                quote_id: id[2],
+                status: trackingData.status,
+                buyout_offer: trackingData.offer,
+                updated_at: Date.now()
+            })
+
             for (let index = 0; index < trackingSheet.length; index++) {
                 const tr = trackingSheet[index]
                 

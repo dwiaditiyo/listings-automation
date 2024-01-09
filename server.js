@@ -1,6 +1,7 @@
 import path from "path";
 import dotenv from 'dotenv'
 import express  from "express";
+import moment from 'moment-timezone';
 import puppeteer from "puppeteer-extra";
 import StealthPlugin from 'puppeteer-extra-plugin-stealth';
 
@@ -10,10 +11,13 @@ import { runJob } from "./job/schedule.js";
 import { grabListing } from "./controllers/grabListingController.js";
 import { uploadListing } from "./controllers/uploadListingController.js";
 import { insertSheetListing, grabSheetFetch, updateSheetFetch, deleteSheetFetch } from "./config/spreadsheet.js";
+import { log } from "console";
 
 dotenv.config()
 
 const db = new FSDB("./db.json", false)
+const dbposhmark = new FSDB("./dbposhmark.json", false)
+const dbfashionphile = new FSDB("./dbfashionphile.json", false)
 
 const app = express()
 const port = 3000
@@ -34,17 +38,35 @@ app.use(express.static(path.join(__dirname, 'views')))
 puppeteer.use(StealthPlugin())
 
 // tracking part
-runJob()
+// runJob()
 
 app.get('/', async (req, res) => {
     const login_data = db.get("fs_login")
-  
+    
     if (typeof login_data !== 'undefined'){
         login_data.password = 'its not a password'
         res.render('index.ejs', { data : login_data })
     }else{
         res.render('index.ejs', { data : '' })
     }
+})
+
+app.get('/tracking', async (req, res) => {
+    // const poshmark = dbposhmark.getAll()
+    // const fashionphile = dbfashionphile.getAll()
+
+    const fashionphile = dbfashionphile.get('fashionphile')
+    const poshmark = dbposhmark.get('poshmark')
+
+    fashionphile.map((fs, idx) => {
+        poshmark.map(ps =>{
+            if(fs[0] == ps[0]){
+                fashionphile[idx] = fashionphile[idx].concat(ps)
+            }
+        })
+    })
+
+    res.render('tracking.ejs', { poshmark: poshmark, fashionphile: fashionphile, moment: moment })
 })
 
 app.get('/fetch-listings', async (req, res) => {
