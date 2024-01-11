@@ -205,8 +205,11 @@ export const fashionphileTrack = async() => {
     
                 for (let index = 0; index < trackingSheet.length; index++) {
                     const tr = trackingSheet[index]
-                    
-                    if(tr.title == trackingData.title){
+
+                    let idFahionphile = trackingData.title.split(" ")
+                    let idPoshmark = tr.title.split(" ")
+
+                    if(`#${idPoshmark[0]}` == `#${idFahionphile[0]}`){
                         await updateTrackingFashionphile(tr.row, trackUrl, trackingData.status, trackingData.offer)
                     }
                 }

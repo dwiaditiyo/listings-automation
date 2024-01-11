@@ -9,7 +9,7 @@ import { fileURLToPath } from 'url';
 import { FSDB } from "file-system-db";
 import { runJob } from "./job/schedule.js";
 import { grabListing } from "./controllers/grabListingController.js";
-import { fashionphileTrack } from '../controllers/trackingController.js'
+import { fashionphileTrack } from './controllers/trackingController.js'
 import { uploadListing } from "./controllers/uploadListingController.js";
 import { insertSheetListing, grabSheetFetch, updateSheetFetch, deleteSheetFetch } from "./config/spreadsheet.js";
 
@@ -38,7 +38,7 @@ app.use(express.static(path.join(__dirname, 'views')))
 puppeteer.use(StealthPlugin())
 
 // tracking part
-runJob()
+// runJob()
 
 app.get('/', async (req, res) => {
     const login_data = db.get("fs_login")
@@ -60,7 +60,10 @@ app.get('/tracking', async (req, res) => {
 
     fashionphile.map((fs, idx) => {
         poshmark.map(ps =>{
-            if(fs[0] == ps[0]){
+            let fs_id = fs[0].split(" ")
+            let ps_id = ps[0].split(" ")
+
+            if(`#${ps_id[0]}` == `#${fs_id[0]}`){
                 fashionphile[idx] = fashionphile[idx].concat(ps)
             }
         })
@@ -176,6 +179,7 @@ app.get('/upload-listings', async (req, res) => {
             for (let index = 0; index < fetchData.length; index++) {
 
                 const poshMarkTitle = fetchData[index].title;
+                fetchData[index].title = `#${Date.now()} ${poshMarkTitle}`
 
                 if (typeof poshMarkTitle !== 'undefined'){
 
@@ -209,9 +213,8 @@ app.get('/test', async (req, res) => {
 })
 
 app.get('/track-fs', async (req, res) => {
-    await fashionphileTrack()
-
-    res.send('ok')
+    fashionphileTrack()
+    res.redirect('/');
 })
 
 app.listen(port, () =>{
