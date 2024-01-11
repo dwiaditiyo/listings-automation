@@ -83,12 +83,17 @@ export const uploadListing = async (browser, product) => {
                 // await page.waitForSelector('#sell-submission>button:not([disabled])')
                 await page.click("#sell-submission>button")
 
+                return { status: true, message: 'Listings Submited!' }
+
             }else{
                 console.log('Category not found!')
+
+                return { status: false, message: 'Category not found!' }
             }
     
         }else{
             console.log('Designer not found!')
+            return { status: false, message: 'Designer not found!' }
         }
     }
 }

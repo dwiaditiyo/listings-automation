@@ -45,7 +45,17 @@ export const poshmarkTrack = async () => {
     
         const page = await browser.newPage()
         await page.setViewport({ width: 1366, height: 768})
-    
+        await page.setRequestInterception(true)
+
+        page.on('request', (req) => {
+            if(req.resourceType() === 'image'){
+                req.abort();
+            }
+            else {
+                req.continue();
+            }
+        })
+
         const tracking = await getSheetTracking()
     
         if (tracking.length == 0) {
@@ -106,7 +116,17 @@ export const fashionphileTrack = async() => {
         
         const page = await browser.newPage()
         await page.setViewport({ width: 1366, height: 768})
-    
+        await page.setRequestInterception(true)
+        
+        page.on('request', (req) => {
+            if(req.resourceType() === 'image'){
+                req.abort();
+            }
+            else {
+                req.continue();
+            }
+        });
+
         const trackingSheet = await getSheetTracking()
     
         if (trackingSheet.length == 0) {
@@ -198,7 +218,7 @@ export const fashionphileTrack = async() => {
         }
 
     } catch (error) {
-        
+
         console.log(error.message)
         await browser.close()
         browser = {}

@@ -9,9 +9,9 @@ import { fileURLToPath } from 'url';
 import { FSDB } from "file-system-db";
 import { runJob } from "./job/schedule.js";
 import { grabListing } from "./controllers/grabListingController.js";
+import { fashionphileTrack } from '../controllers/trackingController.js'
 import { uploadListing } from "./controllers/uploadListingController.js";
 import { insertSheetListing, grabSheetFetch, updateSheetFetch, deleteSheetFetch } from "./config/spreadsheet.js";
-import { log } from "console";
 
 dotenv.config()
 
@@ -38,7 +38,7 @@ app.use(express.static(path.join(__dirname, 'views')))
 puppeteer.use(StealthPlugin())
 
 // tracking part
-// runJob()
+runJob()
 
 app.get('/', async (req, res) => {
     const login_data = db.get("fs_login")
@@ -178,11 +178,14 @@ app.get('/upload-listings', async (req, res) => {
                 const poshMarkTitle = fetchData[index].title;
 
                 if (typeof poshMarkTitle !== 'undefined'){
-                    await uploadListing(browser, fetchData[index])
-        
-                    await insertSheetListing(fetchData[index])
-        
-                    await deleteSheetFetch(fetchData[index].id)
+
+                    const listing = await uploadListing(browser, fetchData[index])
+
+                    if(listing.status != false){
+
+                        await insertSheetListing(fetchData[index])
+                        await deleteSheetFetch(fetchData[index].id)
+                    }
                 }
             }
 
@@ -203,6 +206,12 @@ app.get('/upload-listings', async (req, res) => {
 app.get('/test', async (req, res) => {
     const fetchData = await grabSheetFetch()
     console.log(fetchData);
+})
+
+app.get('/track-fs', async (req, res) => {
+    await fashionphileTrack()
+
+    res.send('ok')
 })
 
 app.listen(port, () =>{

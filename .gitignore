@@ -130,5 +130,8 @@ dist
 .pnp.*
 
 db.json
+dbfashionphile.json
+dbposhmark.json
+db.json
 resources
 cookies.json

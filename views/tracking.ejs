@@ -63,7 +63,8 @@
 <script>
     var table = new DataTable('#example', {
         pagingType: 'full_numbers',
-        // order: [[ 1, 'asc' ]],
+        order: [[ 3, 'asc' ]],
+        pageLength: 25
     });
     function format(url, status, updated_at) {
       return `<div>
