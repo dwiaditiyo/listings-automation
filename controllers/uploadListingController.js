@@ -14,7 +14,11 @@ export const uploadListing = async (browser, product) => {
 
         await page.goto('https://www.fashionphile.com/sell-your-bag', { waitUntil: 'networkidle2', timeout: 0 })
         
+        
         await delay(2000)
+        // type the title
+        await page.evaluate(text => { document.querySelector('#itemName').value = text; }, product.title);
+        
         const designerArray = await page.evaluate(() => {
 
             const designerTag = Array.from(document.querySelectorAll('#Designer>option'))
@@ -65,7 +69,7 @@ export const uploadListing = async (browser, product) => {
 
                 await page.select('#Category', category[1])
         
-                await page.type("#itemName", product.title)
+                // await page.type("#itemName", product.title)
                 await page.type("#description", product.description)
                 
                 const inputUploadHandle = await page.$('.image-uploader>div>[type="file"]')

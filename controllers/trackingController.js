@@ -152,7 +152,23 @@ export const fashionphileTrack = async() => {
     
             var trackId = await page.evaluate(() => {
                 const idTag = Array.from(document.querySelectorAll('.images>.text-muted'))
-                const id = idTag.map(cat => cat.outerText)
+                var id = idTag.map(cat => cat.outerText)
+
+                const quotesTag = Array.from(document.querySelectorAll('.panel-body>div.col-sm-6'))
+                const quotesText = quotesTag.map(qtag => qtag.outerText)
+
+                var noQuotes = []
+                quotesText.map(qtext => {
+                    let theText = qtext.split(" ")
+                    let finalText = theText[2].replace(/(\r\n|\n|\r)/gm, " ").split(" ")
+
+                    if(qtext.includes('sorry')){
+                        noQuotes.push(finalText[0])
+                    }
+                })
+
+                id = id.filter(val => !val.includes(noQuotes));
+
                 return id
             })
     
@@ -165,8 +181,25 @@ export const fashionphileTrack = async() => {
     
                     const trackIdPgn = await page.evaluate(() => {
                         const idTag = Array.from(document.querySelectorAll('.images>.text-muted'))
-                        const id = idTag.map(cat => cat.outerText)
+                        var id = idTag.map(cat => cat.outerText)
+
+                        const quotesTag = Array.from(document.querySelectorAll('.panel-body>div.col-sm-6'))
+                        const quotesText = quotesTag.map(qtag => qtag.outerText)
+
+                        var noQuotes = []
+                        quotesText.map(qtext => {
+                            let theText = qtext.split(" ")
+                            let finalText = theText[2].replace(/(\r\n|\n|\r)/gm, " ").split(" ")
+
+                            if(qtext.includes('sorry')){
+                                noQuotes.push(finalText[0])
+                            }
+                        })
+
+                        id = id.filter(val => !val.includes(noQuotes));
+
                         return id
+                       
                     })
     
                     trackId = trackId.concat(trackIdPgn)

@@ -97,6 +97,16 @@ app.get('/fetch-listings', async (req, res) => {
         const page = await browser.newPage()
 
         await page.setViewport({ width: 1366, height: 768})
+        await page.setRequestInterception(true)
+        
+        page.on('request', (req) => {
+            if(req.resourceType() === 'image'){
+                req.abort();
+            }
+            else {
+                req.continue();
+            }
+        });
 
         const url = await grabSheetFetch()
         
