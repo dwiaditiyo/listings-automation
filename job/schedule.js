@@ -5,8 +5,8 @@ export const runJob = ()=> {
 
     try {
         
-        cron.schedule('0 0 */2 * * *', () => {
-            console.log("running a task every 2 hours")
+        cron.schedule('0 0 */4 * * *', () => {
+            console.log("running a task every 4 hours")
             poshmarkTrack()
         })
         
