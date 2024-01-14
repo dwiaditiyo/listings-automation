@@ -72,7 +72,11 @@ export const poshmarkTrack = async () => {
                     return sold
                 })
                 
-                await updateTrackingPhoshmark(tr.row, availabilityCheck)
+                try {
+                    await updateTrackingPhoshmark(tr.row, availabilityCheck)
+                } catch (error) {
+                    console.log(error.message)
+                }
         
                 await delay(10000)
             }
@@ -86,8 +90,8 @@ export const poshmarkTrack = async () => {
     } catch (error) {
         console.log(error)
 
-        await browser.close()
-        browser = {}
+        // await browser.close()
+        // browser = {}
     }
 }
 
@@ -127,7 +131,11 @@ export const fashionphileTrack = async() => {
             }
         });
 
-        const trackingSheet = await getSheetTracking()
+        try {
+            var trackingSheet = await getSheetTracking()
+        } catch (error) {
+            console.log(error.message)
+        }
     
         if (trackingSheet.length == 0) {
             await browser.close()
@@ -216,34 +224,47 @@ export const fashionphileTrack = async() => {
                 await delay(1000)
                 await page.goto(trackUrl, { waitUntil: 'networkidle2', timeout: 0 })
                 
-                const trackingData = await page.evaluate(() => {
-                    const statusTag = document.querySelectorAll('.done')[document.querySelectorAll('.done').length-1].cloneNode(true)
-                    statusTag.removeChild(statusTag.querySelector('.children'))
-                    statusTag.removeChild(statusTag.querySelector('div'))
-        
-                    const title = document.querySelector('.description>p').outerText
-                    const status = statusTag.outerText
-                    const offer = document.querySelector('.quoteCard>div>div>div.semibold').outerText
-        
-                    return { title: title, status: status, offer: offer }
-                })
-    
-                await insertFashionphile({
-                    title: trackingData.title,
-                    quote_id: id[2],
-                    status: trackingData.status,
-                    buyout_offer: trackingData.offer,
-                    updated_at: Date.now()
-                })
-    
-                for (let index = 0; index < trackingSheet.length; index++) {
-                    const tr = trackingSheet[index]
+                try {
+                    
+                    var trackingData = await page.evaluate(() => {
+                        const statusTag = document.querySelectorAll('.done')[document.querySelectorAll('.done').length-1].cloneNode(true)
+                        statusTag.removeChild(statusTag.querySelector('.children'))
+                        statusTag.removeChild(statusTag.querySelector('div'))
+            
+                        const title = document.querySelector('.description>p').outerText
+                        const status = statusTag.outerText
+                        const offer = document.querySelector('.quoteCard>div>div>div.semibold').outerText
+            
+                        return { title: title, status: status, offer: offer }
+                    })
 
-                    let idFahionphile = trackingData.title.split(" ")
-                    let idPoshmark = tr.title.split(" ")
+                } catch (error) {
+                    var trackingData = null
+                }
+                
+                if(trackingData != null){
 
-                    if(`#${idPoshmark[0]}` == `#${idFahionphile[0]}`){
-                        await updateTrackingFashionphile(tr.row, trackUrl, trackingData.status, trackingData.offer)
+                    await insertFashionphile({
+                        title: trackingData.title,
+                        quote_id: id[2],
+                        status: trackingData.status,
+                        buyout_offer: trackingData.offer,
+                        updated_at: Date.now()
+                    })
+        
+                    for (let index = 0; index < trackingSheet.length; index++) {
+                        const tr = trackingSheet[index]
+    
+                        let idFahionphile = trackingData.title.split(" ")
+                        let idPoshmark = tr.title.split(" ")
+    
+                        if(`#${idPoshmark[0]}` == `#${idFahionphile[0]}`){
+                            try {
+                                await updateTrackingFashionphile(tr.row, trackUrl, trackingData.status, trackingData.offer)
+                            } catch (error) {
+                                console.log(error.message);
+                            }
+                        }
                     }
                 }
         
@@ -256,8 +277,6 @@ export const fashionphileTrack = async() => {
     } catch (error) {
 
         console.log(error.message)
-        await browser.close()
-        browser = {}
     }
 }
 
