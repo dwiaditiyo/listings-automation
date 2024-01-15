@@ -13,11 +13,13 @@ import { fashionphileTrack } from './controllers/trackingController.js'
 import { uploadListing } from "./controllers/uploadListingController.js";
 import { insertSheetListing, grabSheetFetch, updateSheetFetch, deleteSheetFetch } from "./config/spreadsheet.js";
 
+import { ignoreTrack } from "./config/database.js";
 dotenv.config()
 
 const db = new FSDB("./db.json", false)
 const dbposhmark = new FSDB("./dbposhmark.json", false)
 const dbfashionphile = new FSDB("./dbfashionphile.json", false)
+const dbignoretrack = new FSDB("./dbignoretrack.json", false)
 
 const app = express()
 const port = 3000
@@ -218,8 +220,18 @@ app.get('/upload-listings', async (req, res) => {
 })
 
 app.get('/test', async (req, res) => {
-    const fetchData = await grabSheetFetch()
-    console.log(fetchData);
+    const fashionphile = dbfashionphile.get('fashionphile')
+    fashionphile.forEach(element => {
+     
+        if(element[3] == 'no offer'){
+
+            ignoreTrack(element[1])
+        }
+    })
+
+    const ignore = dbignoretrack.get('ignoreTrack')
+
+    res.send('ok')
 })
 
 app.get('/track-fs', async (req, res) => {

@@ -5,16 +5,17 @@ import StealthPlugin from 'puppeteer-extra-plugin-stealth'
 import { oke } from './trackingFromshtController.js';
 import { FSDB } from "file-system-db";
 import { delay } from "./helperController.js"
-import { insertFashionphile } from '../config/database.js'
+import { insertFashionphile, ignoreTrack } from '../config/database.js'
 import { loginFashionphile } from "./loginScrapeController.js"
 import { getSheetTracking, updateTrackingPhoshmark, updateTrackingFashionphile } from "../config/spreadsheet.js"
-
 
 dotenv.config()
 
 const headless = process.env.HIDE_BROWSER
 const browserPath = process.env.BROWSER_PATH
+
 const fashionphile = new FSDB("./dbfashionphile.json", false)
+const dbignoretrack = new FSDB("./dbignoretrack.json", false)
 
 
 puppeteer.use(StealthPlugin())
@@ -132,6 +133,7 @@ export const fashionphileTrack = async() => {
         });
 
         try {
+            var ignore = dbignoretrack.get('ignoreTrack')
             var trackingSheet = await getSheetTracking()
         } catch (error) {
             console.log(error.message)
@@ -213,7 +215,9 @@ export const fashionphileTrack = async() => {
                     trackId = trackId.concat(trackIdPgn)
                 }
             }
-    
+            
+            trackId = trackId.filter(val => !val.includes(ignore));
+
             await fashionphile.delete("fashionphile");
             await fashionphile.set("fashionphile", [])
     
@@ -269,7 +273,16 @@ export const fashionphileTrack = async() => {
                 }
         
             }
-    
+            
+            const fashionphiledt = fashionphile.get('fashionphile')
+            fashionphiledt.forEach(element => {
+             
+                if(element[3] == 'no offer'){
+        
+                    ignoreTrack(element[1])
+                }
+            })
+
             await browser.close()
             browser = {}
         }
