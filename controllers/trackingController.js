@@ -167,17 +167,14 @@ export const fashionphileTrack = async() => {
                 const quotesTag = Array.from(document.querySelectorAll('.panel-body>div.col-sm-6'))
                 const quotesText = quotesTag.map(qtag => qtag.outerText)
 
-                var noQuotes = []
                 quotesText.map(qtext => {
                     let theText = qtext.split(" ")
                     let finalText = theText[2].replace(/(\r\n|\n|\r)/gm, " ").split(" ")
 
                     if(qtext.includes('sorry')){
-                        noQuotes.push(finalText[0])
+                        id = id.filter(val => !val.includes(finalText[0]));
                     }
                 })
-
-                id = id.filter(val => !val.includes(noQuotes));
 
                 return id
             })
@@ -196,27 +193,33 @@ export const fashionphileTrack = async() => {
                         const quotesTag = Array.from(document.querySelectorAll('.panel-body>div.col-sm-6'))
                         const quotesText = quotesTag.map(qtag => qtag.outerText)
 
-                        var noQuotes = []
                         quotesText.map(qtext => {
                             let theText = qtext.split(" ")
                             let finalText = theText[2].replace(/(\r\n|\n|\r)/gm, " ").split(" ")
 
                             if(qtext.includes('sorry')){
-                                noQuotes.push(finalText[0])
+                                id = id.filter(val => !val.includes(finalText[0]));
                             }
                         })
 
-                        id = id.filter(val => !val.includes(noQuotes));
-
                         return id
-                       
                     })
     
                     trackId = trackId.concat(trackIdPgn)
                 }
             }
-            
-            trackId = trackId.filter(val => !val.includes(ignore));
+
+            for (let index = 0; index < ignore.length; index++) {
+                const ignoreId = ignore[index];
+
+                for (let indexy = 0; indexy < trackId.length; indexy++) {
+                    const trId = trackId[indexy];
+
+                    if(trId.includes(ignoreId)){
+                        trackId.splice(indexy, 1)
+                    }
+                }
+            }
 
             await fashionphile.delete("fashionphile");
             await fashionphile.set("fashionphile", [])
